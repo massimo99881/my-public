@@ -1,0 +1,348 @@
+% Preamble
+
+\documentclass{amsart}
+
+%\usepackage{amssymb, amscd, amsfonts}
+%\usepackage[mathscr]{eucal}
+%\usepackage{graphicx}
+\usepackage{lscape}
+\usepackage{tikz}
+\usepackage{scalefnt}
+%\usepackage[applemac]{inputenc}
+\usepackage[latin1]{inputenc}
+%\usepackage[utf8x]{inputenc}
+%\usepackage{verbatim}
+%\usepackage[export]{adjustbox}
+%\usepackage{lipsum}
+\usepackage{float}% If comment this, figure moves to Page 2
+\usepackage[pgf,outputdir={docgraphs/}]{dot2texi}
+%\usepackage[active,tightpage]{preview}
+\usetikzlibrary{shapes,automata,arrows}
+
+
+%% Definitions of proclamation environments, commands, shorthands, et cetera
+
+% Proclamation environments
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{fact}[theorem]{Fact}
+
+\theoremstyle{definition}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{algoprob}{Problem}        % To typeset decision problems
+
+\theoremstyle{remark}
+\newtheorem*{algoinst}{Instance}       % To typeset decision problems
+
+\theoremstyle{remark}
+\newtheorem*{algoquest}{Question}       % To typeset decision problems
+
+\theoremstyle{remark}
+\newtheorem*{conjecture}{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+
+\theoremstyle{remark}
+\newtheorem*{question}{Question}
+
+\theoremstyle{definition}
+\newtheorem{remark}{Remark}
+
+\theoremstyle{definition}
+\newtheorem*{remarks}{Remarks}
+
+\theoremstyle{definition}
+\newtheorem{example}{Example}
+
+\theoremstyle{remark}
+\newtheorem{examples}{Examples}
+
+\theoremstyle{definition}
+\newtheorem{notation}[theorem]{Notation}
+
+\theoremstyle{remark}
+\newtheorem*{addnotation}{Additional Notation}
+
+\theoremstyle{remark}
+\newtheorem*{runningnotation}{Running Notation}
+
+% Math Commands
+
+\newcommand{\barecoeff}[2]{\gen\frac {} {} {0pt} {} {#1}{#2}}
+\newcommand{\wstirl}[2]{\bigl\{\bigl\{\genfrac{}{}{0pt}{}{#1}{#2}\bigr\}\bigr\}}
+\newcommand{\sstirl}[2]{ \genfrac {\{} {\}} {0pt} {} {#1}{#2} }
+\newcommand{\wbinom}[2]{\bigl(\bigl(\genfrac{}{}{0pt}{}{#1}{#2}\bigr)\bigr)}
+
+
+% Math Operators
+
+\DeclareMathOperator{\fan}{\rm Fan}
+\DeclareMathOperator{\chrom}{\chi} \DeclareMathOperator{\sign}{\rm
+signum} \DeclareMathOperator{\partitio}{\rm p}
+\DeclareMathOperator{\bbpartitio}{\rm p}
+\DeclareMathOperator{\bbcappartitio}{\mathscr{P}}
+\DeclareMathOperator{\Sub}{\rm Sub}
+\DeclareMathOperator{\Parts}{\mathscr{P}}
+\DeclareMathOperator{\MVParts}{\mathscr{MVP}}
+\DeclareMathOperator{\Hom}{\textsc Hom}
+\DeclareMathOperator{\Var}{\textxsc Var}
+\DeclareMathOperator{\F}{\textxsc Form}
+\DeclareMathOperator{\Eval}{\textsc Eval}
+\DeclareMathOperator{\rank}{\rm rank}
+\DeclareMathOperator{\pos}{\rm pos} \DeclareMathOperator{\lin}{\rm
+lin} \DeclareMathOperator{\relint}{\rm relint}
+\DeclareMathOperator{\con}{\rm conv}
+\DeclareMathOperator{\aff}{\rm aff}
+\DeclareMathOperator{\supp}{\rm supp}
+\DeclareMathOperator{\eff}{\rm eff} \DeclareMathOperator{\st}{\rm
+star} \DeclareMathOperator{\cstar}{\rm cstar}
+\DeclareMathOperator{\lnk}{\rm link}
+\DeclareMathOperator{\rel}{\rm relint}
+\DeclareMathOperator{\Dom}{\rm Dom} \DeclareMathOperator{\Cod}{\rm
+Cod} \DeclareMathOperator{\Ker}{\rm Ker}
+\DeclareMathOperator{\Ran}{\rm Range}
+\DeclareMathOperator{\GRan}{\rm GRange}
+\DeclareMathOperator{\Dim}{\rm Dim}
+\DeclareMathOperator{\vertices}{\rm vert}
+\DeclareMathOperator{\Rad}{\mathscr{R}}
+\DeclareMathOperator{\Spec}{\bf Spec}
+\DeclareMathOperator{\Max}{\bf MaxSpec}
+\DeclareMathOperator{\Zero}{\mathbf{Z}}
+\DeclareMathOperator{\V}{\mathbb{V}}
+\DeclareMathOperator{\I}{\mathbb{I}}
+\DeclareMathOperator{\E}{\mathbb{E}}
+\DeclareMathOperator{\A}{\mathbb{A}}
+\DeclareMathOperator{\Aut}{\rm Aut}
+\DeclareMathOperator{\FaceId}{\rm FaceId}
+\DeclareMathOperator{\FaceR}{\rm FaceR}
+\DeclareMathOperator{\GroupId}{\rm GroupId}
+\DeclareMathOperator{\GroupR}{\rm GroupR}
+\DeclareMathOperator{\den}{\rm den} \DeclareMathOperator{\lcm}{\rm
+lcm}
+
+\DeclareMathOperator{\tree}{\rm Tree}
+
+% Commands
+
+%% Temporary Annotations
+
+\newcommand{\commento}[1]{\marginpar{\footnotesize \flushleft{ #1}}}
+
+\newcommand{\remove}[1]{}
+
+%% Sets of Numbers
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\Prim}{{\mathbb{P}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}}
+\newcommand{\CC}{{\mathscr{C}}}
+\newcommand{\lex}{{\overrightarrow{\oplus}}}
+\newcommand{\MVN}{{\mathbb{M}\mathbb{V}\mathbb{N}}}
+\newcommand{\MVZ}{{\mathbb{M}\mathbb{V}\mathbb{Z}}}
+\newcommand{\MVQ}{{\mathbb{M}\mathbb{V}\mathbb{Q}}}
+\newcommand{\MVR}{{\mathbb{M}\mathbb{V}\mathbb{R}}}
+\newcommand{\MVC}{{\mathbb{M}\mathbb{V}\mathbb{C}}}
+
+%% Frequent Bores
+\newcommand{\asc}{\mathrm{asc}}
+\newcommand{\des}{\mathrm{des}}
+
+\newcommand{\QQ}{ \mathbb{Q} } % -- Rational numbers
+\newcommand{\NN}{\mathbb{N}} % --- Natural numbers
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\LL}{\mathcal{L}}
+
+\renewcommand{\SS}{\mathcal{S}}
+\newcommand{\vbold}{\mathbf{v}}
+\newcommand{\wbold}{\mathbf{w}}
+\newcommand{\mss}{{\sf m}}
+\newcommand{\M}{{\mathscr{M}}}
+\newcommand{\G}{{\mathbf{\Gamma}}}
+\newcommand{\Hats}{{\mathbf{H}}}
+\newcommand{\lgp}{{$\ell$-group }}
+\newcommand{\lgpO}{{$\ell$-group. }}
+\newcommand{\lgps}{{$\ell$-groups }}
+\newcommand{\lgpsO}{{$\ell$-groups. }}
+\newcommand{\Fl}{\mathscr{A}}
+\newcommand{\Fln}{\mathscr{A}_n}
+\newcommand{\MV}{MV algebra }
+\newcommand{\MVO}{MV algebra. }
+\newcommand{\MVs}{MV algebras }
+\newcommand{\MVsO}{MV algebras. }
+\newcommand{\FMV}{\mathscr{M}}
+\newcommand{\FMVn}{\mathscr{M}_n}
+\newcommand{\Pro}{\textsc{BasProj}}
+\newcommand{\In}{\textsc{Input: $\, \,$}}
+\newcommand{\Out}{\textsc{Output: $\, \,$}}
+\newcommand{\Y}{\textsc{Yes }}
+\newcommand{\No}{\textsc{No }}
+\newcommand{\pvar}{\vec{\pi}}
+\newcommand{\li}{\langle \langle}
+\newcommand{\ri}{\rangle \rangle}
+\newcommand{\MM}{\mathcal{M}}
+\renewcommand{\div}{{\, \, \rm div \,\,}}
+
+
+%% Funny Names
+\newcommand{\Lu}{{\L}u\-ka\-s\-i\-e\-w\-icz }
+\newcommand{\Lus}{{\L}u\-ka\-s\-i\-e\-w\-icz's }
+\newcommand{\Bez}{Bezout }
+
+% Body
+\begin{document}
+
+\title{$title}
+
+%%% Authors
+
+%\author{O. M. D'Antona}
+
+%%% Date
+
+\date{\today}
+
+%%% Addresses
+
+%\address[O. M. D'Antona]{Dipartimento di Informatica e Comunicazione,
+%via Comelico 39/41, I-20135 Milano, Italy}
+
+%\email{dantona@dico.unimi.it}
+
+\keywords{sample.tex}
+
+%\subjclass[2000]{Primary: . Secondary: .}
+%%% Abstract
+
+%\begin{abstract}
+%Evoluzione? 
+%\end{abstract}
+
+\maketitle 
+
+Riportiamo di seguito alcuni possibili famiglie di grafi e relativa tabella degli insiemi indipendenti ottenuti con algoritmo forza bruta.
+Questo documento \'e ottenuto eseguendo la classe GraphsTest.java sotto il package test.unimi.isa.graphs
+
+\section{$section1} 
+
+{$output1o1} 
+
+{$output1o2}
+
+\section{$section2} 
+
+{$output1o3}
+
+{$output1o4}
+
+\section{$section3} 
+
+{$output1o5}
+
+{$output1o6}
+
+\section{$section4} 
+
+{$output1o7}
+
+{$output1o8}
+
+\section{$section5} 
+
+{$output1o9}
+
+{$output1o10}
+
+\section{$section6} 
+
+{$output1o11}
+
+{$output1o12}
+
+\section{$section7} 
+
+{$output1o13}
+
+{$output1o14}
+
+\section{$section8} 
+
+{$output1o15}
+
+{$output1o16}
+
+\section{$section9} 
+
+{$output1o17}
+
+{$output1o18}
+
+\section{$section10} 
+
+{$output1o19}
+
+{$output1o20}
+
+\section{$section11} 
+
+{$output1o21}
+
+{$output1o22}
+
+\section{$section12} 
+
+{$output1o23}
+
+{$output1o24}
+
+\section{$section13} 
+
+{$output1o25}
+
+{$output1o26}
+
+\section{$section14} 
+
+{$output1o27}
+
+{$output1o28}
+
+\section{$section15} 
+
+{$output1o29}
+
+{$output1o30}
+
+\section{$section16} 
+
+{$output1o31}
+
+{$output1o32}
+
+\section{$section17}
+
+{$output1o33}
+
+{$output1o34}
+
+\section{$section18}
+
+{$output1o35}
+
+{$output1o36}
+
+\section{$section19}
+
+{$output1o37}
+
+{$output1o38}
+
+
+\end{document} 

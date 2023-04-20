@@ -1,0 +1,17 @@
+digraph finite_state_machine {
+graph[rankdir=BT, center=true, margin=0.2, nodesep=0.1, ranksep=0.3]
+node[shape=circle, fontname="Courier-Bold", fontsize=10, width=0.4, height=0.4, fixedsize=true]
+edge[arrowsize=0.6, arrowhead=vee]
+
+3 -> 4 [dir=none];
+3 -> 5 [dir=none];
+3 -> 6 [dir=none];
+3 -> 7 [dir=none];
+3 -> 8 [dir=none];
+4 -> 7 [dir=none];
+4 -> 8 [dir=none];
+5 -> 7 [dir=none];
+5 -> 8 [dir=none];
+6 -> 7 [dir=none];
+6 -> 8 [dir=none];
+}

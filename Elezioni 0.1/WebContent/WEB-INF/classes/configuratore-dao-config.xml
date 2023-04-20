@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+			http://www.springframework.org/schema/beans 
+			http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+			http://www.springframework.org/schema/tx 
+			http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-3.0.xsd
+	   		">
+ 
+    <bean id="txConfigManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+        <qualifier value="txConfigManager"/>
+    </bean>
+
+    <tx:annotation-driven  transaction-manager="txConfigManager" />
+
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation">
+            <value>classpath:configuratore-sql-config.xml</value>
+        </property>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean class="org.mybatis.spring.SqlSessionTemplate" id="sqlSessionTemplate">
+        <constructor-arg index="0">
+            <ref bean="sqlSessionFactory"/>
+        </constructor-arg>
+    </bean>
+    
+    <!-- scan for mappers and let them be autowired -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="${MapperInterfacePackage}" />
+    </bean>
+    
+     
+    <bean class="org.mybatis.spring.mapper.MapperFactoryBean" id="abstractDao" abstract="true">
+        <property name="sqlSessionTemplate" ref="sqlSessionTemplate"/>
+       
+    </bean>
+    
+    <bean id="pdaDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.PdaDao"/>
+    </bean>
+    <bean id="pdaClienteSedeDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.PdaClienteSedeDao"/>
+    </bean>
+    
+    <!-- elezioni Dao -->
+    <bean id="utenteDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.UtenteDao"/>
+    </bean>
+    <bean id="caricaDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.CaricaDao"/>
+    </bean>
+    <bean id="elezioneDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.ElezioneDao"/>
+    </bean>
+    <bean id="candidaturaDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.CandidaturaDao"/>
+    </bean>
+    <bean id="votazioneDao" parent="abstractDao">
+        <property name="mapperInterface" value="it.elezioni.data.dao.VotazioneDao"/>
+    </bean>
+    
+</beans>

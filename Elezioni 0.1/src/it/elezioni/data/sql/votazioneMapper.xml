@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="it.elezioni.data.dao.VotazioneDao">
+
+	<resultMap id="votazioneMap" type="it.elezioni.data.model.Votazione">
+        <id property="idElezione" column="id_elezione"/>
+        <id property="idUtente" column="id_utente"/>
+        <result property="haVotato" column="ha_votato"/>    
+    </resultMap>
+
+	<insert id="insertVotazioneUtente" useGeneratedKeys="true" keyProperty="idElezione,idUtente">
+		INSERT INTO votazione (
+				id_elezione,
+				id_utente,
+				ha_votato
+			)
+			VALUES (
+				#{idElezione},
+				#{idUtente},
+				#{haVotato}
+			)		
+	</insert>
+	
+</mapper>

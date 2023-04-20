@@ -1,0 +1,222 @@
+% Preamble
+\documentclass{amsart}
+\usepackage{amssymb, amscd, amsfonts}
+\usepackage[mathscr]{eucal}
+\usepackage{graphicx}
+\usepackage{lscape}
+\usepackage[italian]{babel}
+\usepackage{tikz}
+\usetikzlibrary{arrows}
+\usetikzlibrary{arrows,automata}
+\usepackage[applemac]{inputenc}
+%% Sets of Numbers
+\newcommand{\N}{{\mathbb{N}}}
+\newcommand{\Prim}{{\mathbb{P}}}
+\newcommand{\Z}{{\mathbb{Z}}}
+\newcommand{\Q}{{\mathbb{Q}}}
+\newcommand{\R}{{\mathbb{R}}}
+\newcommand{\C}{{\mathbb{C}}} 
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{fact}[theorem]{Fact}
+
+\theoremstyle{definition}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem*{algoprob}{Problem}        % To typeset decision problems
+
+\theoremstyle{remark}
+\newtheorem*{algoinst}{Instance}       % To typeset decision problems
+
+\theoremstyle{remark}
+\newtheorem*{algoquest}{Question}       % To typeset decision problems
+
+\theoremstyle{remark}
+\newtheorem*{conjecture}{Conjecture}
+
+\theoremstyle{definition}
+\newtheorem{problem}{Problem}
+
+\theoremstyle{remark}
+\newtheorem*{question}{Question}
+
+\theoremstyle{definition}
+\newtheorem{remark}{Remark}
+
+\theoremstyle{definition}
+\newtheorem*{remarks}{Remarks}
+
+% Body
+\begin{document}
+
+\title{Riassunto}
+
+%%% Authors
+
+%\author{1/6}
+
+%\author{P. Codara, O. M. D'Antona}
+
+%%% Date
+%\begin{abstract}
+%\end{abstract} 
+
+\date{\today} 
+
+\keywords{IntroGAL.tex}
+\maketitle  
+
+\section{Stable Sets of SuperGrid Graphs via Finite State Automata} 
+
+Gli \emph{insiemi indipendenti} (o anche \emph{insiemi stabili}) di un grafo $G$ sono sotttoinsiemi di vertici di $G$ che non contengono vertici adiacenti. Queste strutture hanno un grande interesse in Informatica se non altro per il motivo che determinare se un grafo possiede un insieme indipendente di data cardinalit\`a \`e un problema NP-completo.\\  
+
+Questa Tesi si occupa della enumerazione degli \emph{insiemi indipendenti} (o anche \emph{insiemi stabili}) di varie classi di grafi. Poche definizioni per illustrarne una che abbiamo chiamato classe dei \emph{grafi supergriglia} o, semplicemente, delle \emph{supergriglie}. Una supergriglia \`e un \emph{prodotto cartesiano} di \emph{potenze di cammini}. La potenza $h$-esima del cammino $P_n$ \`e un grafo, $P_n^{(h)}$, con $n$ vertici ognuno dei quali \`e collegato agli $h$ vertici successivi. Quindi una supergriglia \`e un grafo individuato da quattro parametri: le lunghezze dei due cammini e le loro potenze.\\  
+
+La figura qui sotto mostra, da sinistra a destra, $P_2^{(1)}$, $P_4^{(2)}$ e un $3$-insieme indipendente della SuperGriglia $P_2^{(1)}\times P_4^{(2)}$.
+
+$$\begin{tikzpicture}[,>=stealth',shorten >=1pt,auto,node distance=1.1 cm,
+thick,main node/.style={circle,draw,font=\sffamily},main node2/.style={circle,fill=black!30,draw,font=\sffamily},main node3/.style={circle,fill=yellow!20,draw,font=\sffamily}]
+\node[main node] (1) {};
+\node[main node] (2) [above of=1] {};
+\path[every node/.style={font=\sffamily\small}]
+(1) edge [] node[above] {} (2);
+\end{tikzpicture}\ \ \ \ \ \begin{tikzpicture}[,>=stealth',shorten >=1pt,auto,node distance=1.1 cm,
+thick,main node/.style={circle,draw,font=\sffamily},main node2/.style={circle,fill=black!30,draw,font=\sffamily},main node3/.style={circle,fill=yellow!20,draw,font=\sffamily}]
+\node[main node] (1) {};
+\node[main node] (2) [right of=1] {};
+\node[main node] (3) [right of=2] {};
+\node[main node] (4) [right of=3] {};
+\path[every node/.style={font=\sffamily\small}]
+(1) edge [] node[above] {} (2)
+(1) edge [bend left] node[above] {} (3)
+(2) edge [] node[above] {} (3)
+(2) edge [bend right] node[above] {} (4)
+(3) edge [] node[above] {} (4);
+\end{tikzpicture}\ \ \ \begin{tikzpicture}[,>=stealth',shorten >=1pt,auto,node distance=1.1 cm,
+thick,main node/.style={circle,draw,font=\sffamily},main node2/.style={circle,fill=black!30,draw,font=\sffamily},main node3/.style={circle,fill=yellow!20,draw,font=\sffamily}]
+\node[main node] (1) {};
+\node[main node2] (2) [below of=1] {};
+\node[main node] (3) [right of=1] {};
+\node[main node] (4) [below of=3] {};
+\node[main node2] (5) [right of=3] {};
+\node[main node] (6) [below of=5] {};
+\node[main node] (7) [right of=5] {};
+\node[main node2] (8) [below of=7] {};
+\path[every node/.style={font=\sffamily\small}]
+(1) edge [] node[above] {} (2)
+(1) edge [] node[above] {} (3)
+(1) edge [bend left] node[above] {} (5)
+(2) edge [] node[above] {} (4)
+(2) edge [bend right] node[above] {} (6)
+(3) edge [] node[above] {} (4)
+(3) edge [] node[above] {} (5)
+(3) edge [bend left] node[above] {} (7)
+(4) edge [] node[above] {} (6)
+(4) edge [bend right] node[above] {} (8)
+(5) edge [] node[above] {} (6)
+(5) edge [] node[above] {} (7)
+(7) edge [] node[above] {} (8)
+(6) edge [] node[above] {} (8);
+\end{tikzpicture}$$  
+
+L'originalit\`a della Tesi sta nell'approccio al problema: \emph{per ognuna delle classi considerate, siamo in grado di costruire una automa a stati finiti che riconosce le stringhe che corrispondono agli insiemi indipendenti dei grafi della classe in esame}.\\     
+
+In tal modo siamo in grado di enumerare gli insiemi indipendenti di  grafi (circuiti, $C_n^{(h)}$, e loro prodotti cartesiani) per i quali non si possono applicare le tecniche utilizzate in letteratura [Wilf]. Ecco un esempio: questo automa 
+
+
+$$\begin{tikzpicture}[->,>=stealth',shorten >=1pt,auto,node distance=2.cm,
+thick,main node/.style={circle,fill=blue!20,draw,font=\sffamily},main node2/.style={circle,fill=green!20,draw,font=\sffamily},main node3/.style={circle,fill=yellow!20,draw,font=\sffamily}]
+
+\node[initial,initial text=,state,accepting] (1) {S};
+\node[initial text=,state,accepting] (2) [right of=1] {$G_1$};
+\node[initial text=,state,accepting] (3) [right of=2] {$G_2$};
+\node[initial text=,state,accepting] (4) [right of=3] {$G_3$};
+\node[initial text=,state] (5) [right of=4] {$G_4$};
+\node[initial text=,state] (6) [right of=5] {$G_5$};
+
+\node[initial text=,state,accepting] (7) [below of=2] {$E_1$};
+\node[initial text=,state,accepting] (8) [right of=7] {$E_2$};
+\node[initial text=,state,accepting] (9) [right of=8] {$E_3$};
+\node[initial text=,state] (10) [right of=9] {$E_4$};
+\node[initial text=,state,accepting] (11) [right of=10] {$E_5$};
+
+\node[initial text=,state,accepting] (12) [below of=8] {$F_1$};
+\node[initial text=,state,accepting] (13) [right of=12] {$F_2$}; 
+\node[initial text=,state,accepting] (14) [right of=13] {$F_3$};
+\node[initial text=,state,accepting] (15) [right of=14] {$F_4$};
+
+\path[every node/.style={font=\sffamily\small}]
+
+(1) edge[] node[] {$a$} (2)
+(2) edge[] node[] {$e$} (3)
+(3) edge[] node[] {$e$} (4)
+(4) edge[loop above] node[left=1pt] {e} (4)
+(4) edge[] node[] {$a$} (5)
+(5) edge[] node[] {$e$} (6)
+(6) edge[bend right] node[above] {$e$} (4)
+
+(7) edge[] node[] {$e$} (8)
+(8) edge[] node[] {$e$} (9)
+(9) edge[loop above] node[left=1pt] {e} (9)
+(9) edge[] node[] {$a$} (10)
+(10) edge[] node[] {$e$} (11)
+(11) edge[bend right] node[above] {$a$} (9)
+
+(12) edge[] node[] {$e$} (13)
+(13) edge[loop above] node[left=1pt] {e} (13)
+(13) edge[] node[] {$a$} (14)
+(14) edge[] node[] {$e$} (15)
+(15) edge[bend right] node[above] {$e$} (13)
+
+(1) edge[bend right] node[above] {$e$} (12)
+(12) edge[bend right] node[above] {$a$} (7)
+;
+
+\end{tikzpicture}$$
+
+riconosce (tutte e sole) le stringhe che descrivono gli insiemi indipendenti di $C_6^{(2)}$: 
+
+$$\begin{tikzpicture}[,>=stealth',shorten >=1pt,auto,node distance=1.1 cm,
+thick,main node/.style={circle,draw,font=\sffamily},main node2/.style={circle,fill=black!30,draw,font=\sffamily},main node3/.style={circle,fill=yellow!20,draw,font=\sffamily}]
+\node[main node] (1) {1};
+\node[main node] (2) [above right of=1] {2};
+\node[main node] (3) [right of=2] {3};
+\node[main node] (4) [below right of=3] {4};
+\node[main node] (5) [below left of=4] {5};
+\node[main node] (6) [left of=5] {6};
+\path[every node/.style={font=\sffamily\small}]
+(1) edge [] node[above] {} (2)
+(1) edge [] node[above] {} (3) 
+(1) edge [] node[above] {} (6)
+(2) edge [] node[above] {} (3)
+(1) edge [] node[above] {} (5)
+(2) edge [] node[above] {} (4)
+(2) edge [] node[above] {} (6)
+(3) edge [] node[above] {} (4)
+(3) edge [] node[above] {} (5)
+(4) edge [] node[above] {} (5)
+(4) edge [] node[above] {} (6)
+
+(5) edge [] node[above] {} (6);
+\end{tikzpicture}$$   
+
+I nostri risultati sono ottenuti utilizzando il linguaggio \emph{Java} e l'interazione con il software \emph{Wolfram Mathematica} tramite protocollo \emph{MathLink}. L'ambiente di sviluppo \`e \emph{Wolfram Workbench 2.0}. Le tecnologie di supporto impiegate nella costruzione del programma sono \emph{Spring Framework 3.1}, \emph{JUnit} per i test unitari e \emph{Velocity} per la creazione di documenti pdf da specifico template. 
+
+Altre librerie impiegate sono: \emph{combinatoricslib-2.0}, \emph{log4j-1.2.17} per salvare su file di log i passi di esecuzione di ogni routine del programma, \emph{oeis-java-sdk} libreria che si interfaccia con il sito \emph{oeis.org} e che, data in input una successione, ritorna come output i risultati del database di Sloane. 
+
+Il programma (costituito da circa 70 classi java per un totale di 13.200 righe di codice) \`e stato costruito utilizzando il pattern \emph{MVC (Model View Controller)} dove per la parte controller \`e stato creato un prompt di comando che riceve e interpreta comandi digitati dall'utente ed esegue le routine richieste. 
+
+Contestualmente al pattern MVC \`e stato realizzato il pattern \emph{Singleton} che ha lo scopo di garantire che la classe per la gestione delle connessioni al kernel di Mathematica venga istanziata una sola volta per tutta la durata di esecuzione dell'applicazione. Tale classe fornisce inoltre un punto di accesso globale verso tutte le classi java, similmente a quanto avviene con le connessioni al database per applicazioni \emph{Web Oriented}. 
+
+Per stampare i disegni dei grafi su pdf \`e stato utilizzato il plugin \emph{graphviz} di \emph{LaTex} in combinazione con le potenzialit\`a di \emph{dot2tex}, altro strumento utile per semplificare la sintassi di costruzione di un grafo e che genera la figura corrispondente e la incolla al documento. 	
+
+Per poter eseguire il software \`e necessaria l'installazione di \emph{Mathematica}, del compilatore \emph{LaTex} e del programma \emph{Graphviz}.\\ 
+
+%L'applicazione \`e stata interamente sviluppata e testata su sistema operativo \emph{Microsoft Windows} nelle versioni 7 (32 e 64 bit), 8 e 8.1 (64 bit). 
+
+\end{document}
+

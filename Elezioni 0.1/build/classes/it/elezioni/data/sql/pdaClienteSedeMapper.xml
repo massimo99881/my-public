@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+<mapper namespace="it.elezioni.data.dao.PdaClienteSedeDao">
+
+    <resultMap id="siteMap" type="it.elezioni.data.model.PdaClienteSede">
+        <id property="idSede" column="id_sede"/>
+        <result property="ragSoc" column="ragsoc"/>
+        <result property="indirizzo" column="indirizzo"/>
+        <result property="cap" column="cap"/>
+        <result property="comune" column="comune"/>
+        <result property="nCivico" column="n_civico"/>
+        <result property="idPda" column="id_pda"/>
+    </resultMap>
+
+    <select id="selectSitePDA" parameterType="String" resultType="it.elezioni.data.model.PdaClienteSede" resultMap="siteMap">
+            SELECT *
+            FROM pda_cliente_sede
+            WHERE ref = #{ref}
+    </select>
+
+    <select id="selectByIdPdaAndRef" resultMap="siteMap">
+            SELECT *
+            FROM pda_cliente_sede
+            WHERE id_pda = #{idPda} and ref = #{ref}
+    </select>
+
+    <insert id="insertPdaClienteSede" useGeneratedKeys="true" keyProperty="idSede" parameterType="it.elezioni.data.model.PdaClienteSede">
+        INSERT INTO pda_cliente_sede (
+                    ragsoc,
+                    indirizzo,
+                    cap,
+                    comune,
+                    n_civico,                   
+                    id_pda
+             ) VALUES (
+                    #{ragSoc},
+                    #{indirizzo},
+                    #{cap},
+                    #{comune},
+                    #{nCivico},                   
+                    #{idPda}
+            )
+    </insert>
+
+    <delete id="deleteByIdPda" parameterType="java.lang.Integer" >
+        DELETE FROM pda_cliente_sede
+        WHERE id_pda = #{idPda}
+    </delete>
+
+</mapper>

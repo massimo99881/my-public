@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC "-//ibatis.apache.org//DTD Config 3.0//EN" "http://ibatis.apache.org/dtd/ibatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<!-- changes from the defaults -->
+		<setting name="lazyLoadingEnabled" value="false" />
+	</settings>
+	
+	<typeAliases>
+		<typeAlias type="it.elezioni.data.model.Carica" alias="carica"/>
+		<typeAlias type="it.elezioni.data.model.Utente" alias="utente"/>
+		<typeAlias type="it.elezioni.data.model.Candidatura" alias="candidatura"/>
+	</typeAliases>
+	
+    <mappers>
+        <mapper resource="it/elezioni/data/sql/pdaClienteSedeMapper.xml"/>
+        <mapper resource="it/elezioni/data/sql/pdaMapper.xml"/>
+        <!-- elezioni -->
+        <mapper resource="it/elezioni/data/sql/utenteMapper.xml"/>
+        <mapper resource="it/elezioni/data/sql/caricaMapper.xml"/>
+        <mapper resource="it/elezioni/data/sql/elezioneMapper.xml"/>
+        <mapper resource="it/elezioni/data/sql/candidaturaMapper.xml"/>
+        <mapper resource="it/elezioni/data/sql/votazioneMapper.xml"/>
+    </mappers>
+     
+</configuration>

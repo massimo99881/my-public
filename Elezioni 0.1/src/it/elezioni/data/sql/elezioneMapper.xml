@@ -1,0 +1,326 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="it.elezioni.data.dao.ElezioneDao">
+  
+	<resultMap id="elezioneMap" type="it.elezioni.data.model.Elezione">
+        <id property="idElezione" column="id_elezione"/>
+        <result property="dataCrea" column="data_crea" javaType="java.sql.Date"/>
+        <result property="dataIni" column="data_ini" javaType="java.sql.Date" />
+        <result property="dataFine" column="data_fine" javaType="java.sql.Date"/>
+        <result property="descr" column="descr"/>
+        <result property="dataFineCarica" column="dataFineCarica" javaType="java.sql.Date" /><!-- javaType="java.sql.Date" jdbcType="DATE" -->
+        <result property="idCarica" column="carica"/>
+        <result property="stato" column="stato"/>
+        <association property="carica" resultMap="caricaMap"/>
+    </resultMap>
+
+	<insert id="creaElezione" useGeneratedKeys="true" keyProperty="idElezione" >
+        	INSERT INTO elezione (
+                   data_ini,
+                   data_fine,
+                   descr,
+                   carica
+             ) VALUES (
+                 #{dataIni},
+                 #{dataFine},
+                 #{descr},
+                 #{idCarica}
+            )
+    </insert>
+    
+    <select id="elezioniSenzaCandidati" resultMap="elezioneMap" >
+    	<![CDATA[
+    		select e.* , c.*,
+    		(e.data_fine + (c.durata || ' year')::INTERVAL)::timestamp::date as dataFineCarica
+			from elezione e
+			     join carica c ON c.id_carica = e.carica
+			where e.data_fine > current_date 
+			  AND e.data_ini <= current_date 
+			
+			  and e.id_elezione
+			  NOT IN (
+			     select id_elezione from candidatura
+			  )  
+			;
+    	]]>
+    </select>
+    
+    <select id="selectCaricaJoinElezione" resultMap="elezioneMap" >
+		
+    	SELECT 
+    		c.id_carica, 
+    		c.titolo, 
+    		c.durata,
+			e.id_elezione,
+			e.stato,
+			-- to_char(e.data_crea::timestamp, 'DD/MM/YYYY') as data_crea,
+			e.data_crea,
+			e.data_ini,
+			e.data_fine,
+			e.descr,
+			(e.data_fine + (c.durata || ' year')::INTERVAL)::timestamp::date as dataFineCarica
+		FROM 
+			Carica c JOIN Elezione e ON c.id_carica = e.carica
+		WHERE 
+		 	lower(c.titolo) LIKE lower('%' || #{titolo} || '%')
+		AND 
+			lower(coalesce(e.descr, '')) LIKE lower('%' || #{elezione} || '%') 
+		
+		ORDER BY 
+			e.data_crea DESC;
+    </select>
+    
+    <resultMap id="elezioneVotaMap" type="it.elezioni.data.model.Elezione">
+        <id property="idElezione" column="id_elezione"/>
+        <result property="dataCrea" column="data_crea" javaType="java.sql.Date"/>
+        <result property="dataIni" column="data_ini" javaType="java.sql.Date" />
+        <result property="dataFine" column="data_fine" javaType="java.sql.Date"/>
+        <result property="descr" column="descr"/>
+        <result property="stato" column="stato"/>
+        <result property="dataFineCarica" column="dataFineCarica" javaType="java.sql.Date" />
+        <result property="idCarica" column="carica"/>
+        <result property="totVoti" column="totVoti"/>
+        <result property="nrVotanti" column="nrVotanti"/>
+        <result property="candidati" column="candidati"/>
+        <result property="nomeEletto" column="nomeEletto"/>
+        <result property="cognomeEletto" column="cognomeEletto"/>
+        <association property="carica" resultMap="caricaMap"/>
+    </resultMap>
+    
+    
+    <select id="selectElezioniInCorso" resultMap="elezioneVotaMap" >
+		<![CDATA[
+			SELECT 
+				c.id_carica, 
+				c.titolo, 
+				c.durata,
+				e.id_elezione,
+				e.stato,
+				e.data_crea,
+				e.data_ini,
+				e.data_fine,
+				e.descr,
+				(e.data_fine + (c.durata || ' year')::INTERVAL)::timestamp::date as dataFineCarica,
+				SUM(CASE ha_votato
+					WHEN true THEN 1
+					WHEN false THEN 1
+					ELSE 0 END ) as totVoti,
+				COUNT(ha_votato) as nrVotanti,
+				tmp_candidati.candidati
+			FROM 
+				Carica c 
+				JOIN Elezione e ON c.id_carica = e.carica
+				LEFT JOIN Votazione v ON e.id_elezione = v.id_elezione
+				JOIN 
+				(
+				SELECT e.id_elezione, COUNT(ca.id_utente) as candidati   
+				FROM elezione e 
+				LEFT JOIN candidatura ca ON ca.id_elezione = e.id_elezione
+				
+				GROUP BY e.id_elezione
+				-- HAVING COUNT(ca.id_utente)>0
+					) AS tmp_candidati
+				ON tmp_candidati.id_elezione = e.id_elezione
+			WHERE 
+				data_fine > current_date AND data_crea <= current_date
+				
+			GROUP BY
+				c.id_carica, 
+			c.titolo, 
+			c.durata,
+				e.id_elezione,
+				e.stato,
+				e.data_crea,
+				e.data_ini,
+				e.data_fine,
+				e.descr,
+				tmp_candidati.candidati
+			ORDER BY 
+				e.data_crea DESC;
+		]]>
+	</select>
+    
+
+	<select id="selectElezioniInCorsoUser" resultMap="elezioneVotaMap" >
+		<![CDATA[
+			SELECT 
+				c.id_carica, 
+				c.titolo, 
+				c.durata,
+				e.id_elezione,
+				e.stato,
+				e.data_crea,
+				e.data_ini,
+				e.data_fine,
+				e.descr,
+				(e.data_fine + (c.durata || ' year')::INTERVAL)::timestamp::date as dataFineCarica,
+				SUM(CASE ha_votato
+					WHEN true THEN 1
+					WHEN false THEN 1
+					ELSE 0 END ) as totVoti,
+				COUNT(ha_votato) as nrVotanti,
+				tmp_candidati.candidati
+			FROM 
+				Carica c 
+				JOIN Elezione e ON c.id_carica = e.carica
+				LEFT JOIN Votazione v ON e.id_elezione = v.id_elezione
+				JOIN 
+				(
+				SELECT e.id_elezione, COUNT(ca.id_utente) as candidati   
+				FROM elezione e 
+				LEFT JOIN candidatura ca ON ca.id_elezione = e.id_elezione
+				
+				GROUP BY e.id_elezione
+				-- HAVING COUNT(ca.id_utente)>0
+					) AS tmp_candidati
+				ON tmp_candidati.id_elezione = e.id_elezione 
+				]]>
+			<where>
+			   <include refid="whereSqlElezioniUser" />
+			</where> 
+			<![CDATA[	
+			 
+			 GROUP BY
+				c.id_carica, 
+			c.titolo, 
+			c.durata,
+				e.id_elezione,
+				e.stato,
+				e.data_crea,
+				e.data_ini,
+				e.data_fine,
+				e.descr,
+				tmp_candidati.candidati
+			ORDER BY 
+				e.data_crea DESC;
+				]]>
+	
+	</select>
+	
+	<sql id="whereSqlElezioniUser"  >
+    	1 = 1 
+        <if test="type == 'PerVotare'">
+        	<![CDATA[	
+                AND data_fine > current_date 
+                AND data_ini <= current_date
+            ]]>
+        </if>
+        <if test="type == 'PerCandidarsiGiaCandidato' ">
+        	<![CDATA[
+                AND data_ini > current_date 
+                AND data_crea <= current_date
+				AND e.id_elezione = #{utente.idElezione}
+				AND #{utente.idElezione} IN (
+				    SELECT id_elezione FROM candidatura 
+				    WHERE id_utente=#{utente.idUtente}
+				)
+			]]>
+        </if>
+        <if test="type == 'PerVotareGiaCandidato' ">
+        	<![CDATA[
+                AND data_fine > current_date 
+                AND data_ini <= current_date
+				AND e.id_elezione != #{utente.idElezione}
+			]]>
+        </if>
+        <if test="type == 'PerCandidarsi'">
+        	<![CDATA[
+                AND data_ini > current_date 
+                AND data_crea <= current_date
+            ]]>
+        </if>
+    </sql>
+
+	<select id="selectElezioniStorico" resultMap="elezioneVotaMap" >
+		<![CDATA[
+			SELECT 
+				c.id_carica, 
+				c.titolo, 
+				c.durata,
+				e.id_elezione,
+				e.stato,
+				e.data_crea,
+				e.data_ini,
+				e.data_fine,
+				e.descr,
+				(e.data_fine + (c.durata || ' year')::INTERVAL)::timestamp::date as dataFineCarica,
+				SUM(CASE ha_votato
+					WHEN true THEN 1
+					WHEN false THEN 1
+					ELSE 0 END ) as totVoti,
+				COUNT(ha_votato) as nrVotanti,
+				tmp_eletti.nome as nomeEletto,
+				tmp_eletti.cognome as cognomeEletto 
+			FROM Carica c 
+				JOIN Elezione e ON c.id_carica = e.carica
+				LEFT JOIN Votazione v ON e.id_elezione = v.id_elezione
+				LEFT JOIN (
+					SELECT u.nome,u.cognome,e.id_elezione,c.id_utente, ca.titolo, e.data_fine , MAX(nr_voti) as nrVotiEletto
+					FROM elezione e 
+					     JOIN carica ca ON e.carica = ca.id_carica
+					     JOIN candidatura c ON c.id_elezione = e.id_elezione
+					    JOIN utente u ON u.id_utente = c.id_utente
+					WHERE data_fine <= current_date 
+					GROUP BY u.nome,u.cognome,e.id_elezione,c.id_utente, ca.titolo, e.data_fine
+					HAVING MAX(nr_voti) > ALL (
+						SELECT NULLIF( MAX(c2.nr_voti) , 0)
+						FROM candidatura c2 
+						     JOIN elezione e2  ON c2.id_elezione = e.id_elezione
+						    
+						AND e2.data_fine <= current_date  AND c2.id_utente != c.id_utente
+						GROUP BY c2.id_utente
+					)
+				) AS tmp_eletti ON tmp_eletti.id_elezione = e.id_elezione
+			WHERE 
+				e.data_fine <= current_date 
+			GROUP BY
+				c.id_carica, 
+				c.titolo, 
+				c.durata,
+				e.id_elezione,
+				e.stato,
+				e.data_crea,
+				e.data_ini,
+				e.data_fine,
+				e.descr,
+				tmp_eletti.nome,
+				tmp_eletti.cognome 
+			ORDER BY 
+				e.data_crea DESC;
+		]]>
+	</select>	
+	
+	<delete id="deleteElezioneById" parameterType="java.lang.Integer" >
+   		DELETE FROM elezione
+   		WHERE  id_elezione = #{idElezione}
+	</delete>
+	
+	
+	<update id="disattivaElezioneById" parameterType="java.lang.Integer">
+		UPDATE elezione SET stato = false WHERE id_elezione = #{idElezione}
+	</update>
+	
+	<update id="disattivazioneElezioniPerVotazioni">
+		<![CDATA[
+			/*disattivazione elezioni che risultano senza candidati nel periodo delle votazioni*/
+			UPDATE elezione SET stato = false WHERE id_elezione IN (
+			
+				select e.id_elezione
+					
+				from elezione e
+				     join carica c ON c.id_carica = e.carica
+				where e.data_fine > current_date 
+				  AND e.data_ini <= current_date 
+				
+				  and e.id_elezione
+				  NOT IN (
+				     select id_elezione from candidatura
+				  )
+			)
+		]]>
+	</update>
+  
+</mapper>
