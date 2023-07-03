@@ -1,2 +1,0 @@
--tutti i file dentro la cartella temp si possono eliminare
--NON CANCELLARE i file contenuti dentro la cartella "test-jlr"
