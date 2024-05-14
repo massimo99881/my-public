@@ -1,3 +1,3 @@
-# my-public
+# my-public LaTex
 
-some programs
+bozza per tesi di laurea
